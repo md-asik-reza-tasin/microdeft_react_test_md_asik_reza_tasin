@@ -17,7 +17,13 @@ export default function Register() {
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    if (password.length < 8) {
+    if (name.length === 0) {
+      setLoading(false);
+      return toast.error("Fill up your name please");
+    } else if (email.length === 0) {
+      setLoading(false);
+      return toast.error("Enter your email");
+    } else if (password.length < 8) {
       setLoading(false);
       return toast.error("Password should be at least 9");
     }

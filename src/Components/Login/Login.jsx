@@ -2,18 +2,49 @@ import { useState } from "react";
 import logInImage from "../../../public/login.png";
 import Button from "../Share/Button";
 import { NavLink, useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import Cookies from "universal-cookie";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const cookies = new Cookies();
 
-  const handleButton = (e) => {
+  const handleLogIn = (e) => {
     e.preventDefault();
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/");
-    }, 2000);
+
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    const user = {
+      email,
+      password,
+    };
+    fetch(`https://react-interview.crd4lc.easypanel.host/api/login`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(user),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);
+        if (!data.status) {
+          toast.error(data.status_message);
+        } else {
+          toast.success(data.status_message);
+          cookies.set("token", data.data.token, { path: "/" });
+          form.reset();
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
+        }
+      });
   };
 
   return (
@@ -25,12 +56,13 @@ export default function Login() {
             <h1 className="text-center text-xl text-gray-800">Log in</h1>
             {/* FORM */}
 
-            <form onSubmit={handleButton} className="mt-6">
+            <form onSubmit={handleLogIn} className="mt-6">
               <div>
                 <label className="block text-sm text-gray-800 dark:text-gray-200">
                   Email
                 </label>
                 <input
+                  name="email"
                   type="text"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
@@ -44,6 +76,7 @@ export default function Login() {
                 </div>
 
                 <input
+                  name="password"
                   type="password"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
@@ -63,6 +96,7 @@ export default function Login() {
           </div>
         </div>
       </div>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }
