@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import logInImage from "../../../public/login.png";
 import Button from "../Share/Button";
 import { NavLink, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Cookies from "universal-cookie";
+import { AuthContext } from "../AuthProvider/AuthProvider";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const cookies = new Cookies();
+  const { setUser } = useContext(AuthContext);
 
   const handleLogIn = (e) => {
     e.preventDefault();
@@ -40,6 +42,7 @@ export default function Login() {
           toast.success(data.status_message);
           cookies.set("token", data.data.token, { path: "/" });
           form.reset();
+          setUser(data.data.user);
           setTimeout(() => {
             navigate("/");
           }, 500);

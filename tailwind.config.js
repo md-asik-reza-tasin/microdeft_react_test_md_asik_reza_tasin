@@ -2,7 +2,11 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        fontDisplay: "Protest Revolution, serif",
+      },
+    },
   },
   plugins: [require("daisyui")],
 };
