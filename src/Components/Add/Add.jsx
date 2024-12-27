@@ -1,24 +1,29 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Button from "../Share/Button";
 import Cookies from "universal-cookie";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import { AuthContext } from "../AuthProvider/AuthProvider";
 
 export default function Add() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [color, setColor] = useState("#ff0000");
+  const { setAdd } = useContext(AuthContext);
   const cookies = new Cookies();
 
   const handleAddCourse = (e) => {
     e.preventDefault();
+    setAdd("");
     setLoading(true);
 
     const form = e.target;
     const title = form.title.value;
     const description = form.description.value;
     const badge_text = form.badge_text.value;
-    const badge_color = form.badge_color.value;
+    const badge_color = color;
     const instructor_name = form.instructor_name.value;
+
+    console.log(badge_color);
 
     const course = {
       title,
@@ -49,8 +54,10 @@ export default function Add() {
               data.errors.instructor_name[0]
           );
         } else {
+          setAdd(data.status_message);
           toast.success(data.status_message);
           form.reset();
+          setColor("#ff0000");
           setOpen(false);
         }
       });
@@ -126,14 +133,26 @@ export default function Add() {
                         />
                       </div>
 
-                      <div>
-                        <label className="text-gray-700 dark:text-gray-200">
-                          Badge color
-                        </label>
+                      <div className="grid grid-cols-3 gap-5">
+                        <div className="col-span-2">
+                          <label className="text-gray-700 dark:text-gray-200">
+                            Badge color
+                          </label>
+                          <input
+                            name="badge_color"
+                            type="text"
+                            value={color}
+                            className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                            required
+                            readOnly
+                          />
+                        </div>
                         <input
+                          onChange={(e) => setColor(e.target.value)}
                           name="badge_color"
-                          type="text"
-                          className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
+                          type="color"
+                          value={color}
+                          className="block w-24 h-11 px-4 py-2 mt-8 text-gray-700 bg-white border border-gray-200 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring"
                           required
                         />
                       </div>
@@ -166,6 +185,7 @@ export default function Add() {
           </div>
         )}
       </div>
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   );
 }
